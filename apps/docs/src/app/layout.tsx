@@ -1,5 +1,6 @@
 import "./globals.css";
 import "@repo/ui/styles.css";
+import {Button} from "@repo/ui/button";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
@@ -17,7 +18,10 @@ export default function RootLayout({
 }): JSX.Element {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}> <Button appName="web" className={"flex"}>
+       Click me!
+       Click me now!
+      </Button></body>
     </html>
   );
 }

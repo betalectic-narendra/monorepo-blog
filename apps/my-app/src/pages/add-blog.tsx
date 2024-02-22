@@ -1,34 +1,23 @@
-import { useRouter } from "next/router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
 import usePrivateRoute from "@/hooks/usePrivateRoute";
-import { AuthContext } from "@/context/AuthContext";
-import { getUserData, putData } from "../../helpers/apis";
-interface Blog {}
-function EditBlog() {
+import { postData } from "@/helpers/apis";
+interface Blog {
+  name: string;
+  slug: string;
+  content: string;
+}
+
+const AddBlog: React.FC = () => {
   usePrivateRoute();
-  const {
-    query: { uuid },
-  } = useRouter();
   const { user } = useContext(AuthContext);
+  const [blog, setBlog] = useState<Blog>({ name: "", slug: "", content: "" });
 
-  const [blog, setBlog] = useState<Blog>({});
-  const fetchBlog = async () => {
-    try {
-      const blog = await getUserData(`/blogs/${uuid}`, user.token);
-      setBlog(blog);
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
-  useEffect(() => {
-    fetchBlog();
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await putData(`/blogs/${uuid}`, blog, user.token);
-      alert("Blog updated Successfully");
+      const res = await postData("/blogs", blog, user.token);
+      alert("Photo Added Successfully");
       setBlog(res);
     } catch (err) {
       console.log(err.message);
@@ -59,7 +48,7 @@ function EditBlog() {
             name="slug"
             value={blog?.slug}
             onChange={handleChange}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            className="border border-gray-400 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
           />
         </div>
         <div className="mb-4">
@@ -72,20 +61,20 @@ function EditBlog() {
             name="name"
             value={blog?.name}
             onChange={handleChange}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            className="border border-gray-400 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="content" className="block mb-1">
+          <label htmlFor="tenant" className="block mb-1">
             Tenant:
           </label>
           <input
             type="text"
             id="content"
             name="content"
-            value={blog?.content}
+            value={blog?.tenant}
             onChange={handleChange}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            className="border border-gray-400 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
           />
         </div>
         <button
@@ -97,6 +86,6 @@ function EditBlog() {
       </form>
     </div>
   );
-}
+};
 
-export default EditBlog;
+export default AddBlog;

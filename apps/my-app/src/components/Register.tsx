@@ -1,43 +1,30 @@
 import React, { useContext, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useRouter } from 'next/router';
-
+import { registerUser } from '@/helpers/apis';
 interface Props {
   setRegisterUser: React.Dispatch<React.SetStateAction<boolean>>;
 }
+interface RegisterData{
+
+}
 
 const Register: React.FC<Props> = ({ setRegisterUser }) => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const { login } = useContext(AuthContext);
-  const router=useRouter();
+  const [registerData, setRegisterData] = useState<RegisterData>({email:"",password:""});
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const payload = {
-      email: email,
-      password: password
-    };
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-      if (response.ok) {
-        console.log('Register successful!');
-        let data = await response.json();
-        login(data);
-        router.push("/")
-      } else {
-        console.error('Register failed:', response.statusText);
-      }
+      const response = await registerUser("/register",registerData);
+      setRegisterUser(false);
     } catch (error) {
       console.error('Error:', error);
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setRegisterData({ ...registerData, [name]: value });
+  };
   return (
     <div className="flex flex-col items-center mt-20">
       <h2 className="text-2xl">Register</h2>
@@ -47,8 +34,8 @@ const Register: React.FC<Props> = ({ setRegisterUser }) => {
           <input
             type="email"
             id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={registerData?.email}
+            onChange={handleChange}
             required
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
           />
@@ -58,8 +45,8 @@ const Register: React.FC<Props> = ({ setRegisterUser }) => {
           <input
             type="password"
             id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={registerData?.password}
+            onChange={handleChange}
             required
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
           />

@@ -5,7 +5,7 @@ const usePrivateRoute = (): void => {
   const { user } = useContext(AuthContext);
   const router = useRouter();
   useEffect(() => {
-    if (!user) {
+    if (!user?.token) {
       router.push('/login');
     }
   }, [user, router]);

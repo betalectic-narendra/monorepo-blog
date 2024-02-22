@@ -10,18 +10,18 @@ const Header = () => {
         <h1 className="text-2xl font-bold"> <Link href="/" className="nav-link">Home</Link></h1>
         <nav className="flex">
           <ul className="flex space-x-4">
-            {user?.email &&
+            {user?.token &&
              <>
               <li className="nav-item">
                 <Link href="/my-blogs" className="nav-link">My Blogs</Link>
               </li>
               <li className="nav-item">
-                <Link href="/add-blogs" className="nav-link">Add Blogs</Link>
+                <Link href="/add-blog" className="nav-link">Add Blogs</Link>
               </li>
              </>
             }
             <li className="nav-item">
-              {((user?.email&&<button className="" onClick={logout}>Logout</button>)||<Link href="/login" className="nav-link">Login</Link>)}
+              {((user?.token&&<button className="" onClick={logout}>Logout</button>)||<Link href="/login" className="nav-link">Login</Link>)}
               
             </li>
           </ul>

@@ -2,82 +2,64 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Link from "next/link";
 import usePrivateRoute from "@/hooks/usePrivateRoute";
-
+import { getUserData, deleteData } from "@/helpers/apis";
 function MyBlogs() {
-    usePrivateRoute();
+  usePrivateRoute();
   const { user } = useContext(AuthContext);
-  const [photos, setPhotos] = useState([]);
-  const fetchPhotos = () => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/my-photos`,{
-        method:"POST",
-        headers:{
-           "Content-type":"application/json"
-        },
-        body:JSON.stringify({
-            creator_user_uuid:user?.uuid
-        })
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        console.log("res",res);
-        setPhotos(res);
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
+  const [blogs, setBlogs] = useState([]);
+
+  const fetchBlogs = async () => {
+    try {
+      const blogs = await getUserData(`/user-blogs`, user.token);
+      setBlogs(blogs);
+    } catch (err) {
+      console.log(err.message);
+    }
   };
+
   useEffect(() => {
-    fetchPhotos();
+    fetchBlogs();
   }, []);
-  const handleDelete = (uuid: string) => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/photos/${uuid}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        fetchPhotos();
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
+
+  const handleDelete = async (uuid: string) => {
+    await deleteData(`/blogs/${uuid}`, user.token);
+    alert("Blog deleted successfully.");
+    fetchBlogs();
   };
+  
   return (
     <div>
-  {photos?.length > 0 && photos?.map((photo, index) => (
-    <div
-      key={index + photo?.name}
-      className="mb-8 border-b border-gray-300 py-4 flex items-center"
-    >
-      <img
-        className="w-24 h-24 object-cover rounded-full mr-4"
-        src={photo?.slug}
-        alt={photo.name}
-      />
-      <div className="flex flex-col">
-        <h2 className="text-xl font-semibold">{photo?.name}</h2>
-        <div className="flex mt-2">
-          <Link
-            href={`/edit/${photo?.uuid}`}
-            className="text-blue-500 mr-4 hover:underline"
+      {blogs?.length > 0 &&
+        blogs?.map((blog, index) => (
+          <div
+            key={index + blog?.name}
+            className="mb-8 border-b border-gray-300 py-4 flex items-center"
           >
-            Edit
-          </Link>
-          <button
-            onClick={() => handleDelete(photo?.uuid)}
-            className="bg-red-500 text-white rounded px-3 py-1 focus:outline-none"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
+            <img
+              className="w-24 h-24 object-cover rounded-full mr-4"
+              src={blog?.slug}
+              alt={blog?.name}
+            />
+            <div className="flex flex-col">
+              <h2 className="text-xl font-semibold">{blog?.name}</h2>
+              <div className="flex mt-2">
+                <Link
+                  href={`/edit/${blog?.uuid}`}
+                  className="text-blue-500 mr-4 hover:underline"
+                >
+                  Edit
+                </Link>
+                <button
+                  onClick={() => handleDelete(blog?.uuid)}
+                  className="bg-red-500 text-white rounded px-3 py-1 focus:outline-none"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
     </div>
-  ))}
-</div>
-
   );
 }
 

@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { createContext, useState, ReactNode, use } from "react";
+import React, { createContext, useState, ReactNode, use, useEffect } from "react";
 
 interface User {
   email: string;
@@ -25,14 +25,24 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        setUser(JSON.parse(userData));
+      }
+    }
+  }, []);
   const router=useRouter();
   const login = (user: User) => {
-    console.log(user);
+    localStorage.setItem("user",JSON.stringify(user));
     setUser(user);
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem("user")
     router.push("/login")
   };
 
